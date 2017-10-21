@@ -20,6 +20,11 @@ collectors:
     syntax: "question"
 
 
+removals:
+  - name: "PDFONLY"
+    syntax: "@pdfonly"
+
+
 # Here we define our pages that are not the ones defined by 'breaks'
 
 pages:
