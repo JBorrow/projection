@@ -164,3 +164,64 @@ class Parser(object):
 
         return
 
+
+class Generator(object):
+    """
+    Generic generator object for inheriting to other objects.
+
+    The following functions will need to be implemented by daugter objects:
+
+    + parse() which parses self.input to:
+      - uid (string)
+      - temorary_replacement (string)
+      - output_text (string)
+
+    + unpack(**dict) which unpacks a dictionary to the object's properties.
+
+    + pack() which is the opposite of unpack.
+    """
+    def __init__(self, input=None):
+        """
+        Generators should be built such that they can unpack from dictionaries
+        passed to input if necessary.
+        """
+        if isinstance(input, str):
+            self.input = input
+            self.parse()
+
+        elif isistance(input, dict):
+            # Unpack.
+            self.unpack(**input)
+
+        elif input is None:
+            raise TypeError(
+                "Please pass an object to the input parameter of the generator"
+            )
+
+        else:
+            raise TypeError(
+                f"The item passed to the generator must be of type dict or str,\
+                  you passed an item of type {type(input)}."
+            )
+
+    def parse(self):
+        """
+        Parse the object. This needs to be called from a daughter object.
+        """
+        pass
+
+
+    def unpack(self):
+        """
+        Unpack a dictionary to the object.
+        """
+        pass
+
+    
+    def pack(self):
+        """
+        Return a dictionary that is 'unpackable' with 'unpack'.
+        """
+        pass
+
+
