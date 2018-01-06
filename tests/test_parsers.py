@@ -5,7 +5,7 @@ This can be found in objects.py.
 """
 
 from parser.objects import Parser
-from parser.generators import Collector
+from parser.generators import Collector, Section
 
 import re
 
@@ -72,6 +72,79 @@ def test_no_matches():
 
     expected_output = [
         r"hello world",
+        r"goodbye world",
+        ""
+    ]
+
+    assert expected_output == parser.text
+
+
+def test_section():
+    """
+    Unit test for the parser using the collector.
+
+    Not yet implemented: line numbers.
+    """
+
+    input_text = [
+        r"hello world",
+        r"%%\findme{Section}",
+        r"goodbye world",
+        "",
+    ]
+
+    def secgen(input):
+        return Section(input, r"%%\\findme{(.*?)}", capture=1)
+
+    generators = {
+        re.compile(r"%%\\findme{(.*?)}"): secgen,
+    }
+
+    parser = Parser(input_text, generators)
+
+    expected_output = [
+        r"hello world",
+        "# Section".format(parser.matches[1].uid),
+        r"goodbye world",
+        ""
+    ]
+
+    assert expected_output == parser.text
+
+
+def test_section_and_collector():
+    """
+    Unit test for the parser using the collector and the section
+    at the same time!
+
+    Not yet implemented: line numbers.
+    """
+
+    input_text = [
+        r"hello world",
+        r"%%\findme{Section}",
+        r"%%\findcollector{Collector}",
+        r"goodbye world",
+        "",
+    ]
+
+    def secgen(input):
+        return Section(input, r"%%\\findme{(.*?)}", capture=1)
+
+    def colgen(input):
+        return Collector(input, r"%%\\findcollector{.*?}")
+
+    generators = {
+        re.compile(r"%%\\findme{(.*?)}"): secgen,
+        re.compile(r"%%\\findcollector{.*?}"): colgen,
+    }
+
+    parser = Parser(input_text, generators)
+
+    expected_output = [
+        r"hello world",
+        "# {}".format(parser.matches[1].text),
+        "<!-- Collector {} -->".format(parser.matches[2].uid),
         r"goodbye world",
         ""
     ]
