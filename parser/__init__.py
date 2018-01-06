@@ -1,2 +1,2 @@
-import .objects as objects
-import .generators as generators
+import parser.objects as objects
+import parser.generators as generators

@@ -12,6 +12,12 @@ class Collector(Generator):
     comment -- this is because collectors are dealt with later separately.
     """
     def __init__(self, input, regex=None, line=None):
+        if regex is None:
+            raise ValueError(
+                "Please supply a string or compiled pattern to the regex\
+                 input value."
+            )
+
         self.regex = regex
         self.line = line
 
@@ -31,7 +37,7 @@ class Collector(Generator):
         
         self.uid = uuid.uuid4()
 
-        self.text = re.search(regex, self.input)[0]
+        self.text = re.search(self.regex, self.input)[0]
 
         self.temporary_replacement = str(self.uid)
 

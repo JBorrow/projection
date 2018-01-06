@@ -44,7 +44,7 @@ class Parser(object):
 
     def find_matches(self):
         for number, line in enumerate(self.text):
-            match = self.match(line):
+            match = self.match(line)
             
             if match:
                 self.matches[number] = match(line)
@@ -62,7 +62,7 @@ class Parser(object):
         """
 
         for expression, generator in self.generators.items():
-            matches = expression.findall(line)
+            matches = expression.search(line)
 
             if matches:
                 return generator
@@ -92,16 +92,18 @@ class Parser(object):
             image_prepend = "/"
 
         if extra is None:
-            extra = ["--mathjax"]
+            extra = ["--mathjax", "--wrap=preserve"]
+        elif "--wrap=preserve" not in extra:
+            extra += ["--wrap=preserve"]
 
         joined_text = "\n".join(self.text)
 
         # See the ltmd API reference
-        pre_processed = ltmd.PreProcess(joined_text, ImgPrepend=image_prepend)
-        pandocced = ltmd.RunPandoc(pre_processed.ParsedText, extra=extra)
+        pre_processed = ltmd.PreProcess(joined_text, img_prepend=image_prepend)
+        pandocced = ltmd.run_pandoc(pre_processed.parsed_text, extra=extra)
         post_processed = ltmd.PostProcess(pandocced, pre_processed.parsed_data)
         
-        output_text = post_processed.ParsedText
+        output_text = post_processed.parsed_text
         # End of ltmd use
 
         unjoined_text = output_text.split("\n")
@@ -119,17 +121,20 @@ class Parser(object):
         What we _do_ know though is that our matches will still be in the
         same order! Therefore we only need to test against a single item.
         """
+        if len(self.matches) == 0:
+            return
+
         new_matches = {}
 
         match_items = self.matches.items()
         search_items = [x[1] for x in match_items]
        
         # Set initial check
-        check_for = match_items.pop(0)
+        check_for = search_items.pop(0)
 
-        for line_number, generator in enumerate(self.text):
-            if generator.temporary_replacement == check_for:
-                new_matches[line_number] = generator
+        for line_number, line in enumerate(self.text):
+            if line == check_for.temporary_replacement:
+                new_matches[line_number] = check_for
                
                 try:
                     check_for = search_items.pop(0)
@@ -159,7 +164,7 @@ class Parser(object):
         This should preserve line numbers.
         """
         
-        for line_number, match in self.matches:
+        for line_number, match in self.matches.items():
             self.text[line_number] = match.output_text
 
         return
