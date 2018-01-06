@@ -31,3 +31,19 @@ def assign_section_line_numbers(parser: Parser) -> List[Section]:
     return sections
 
 
+def assign_section_text(parser: Parser) -> List[Section]:
+    """
+    Assign the relevant text to each 'section'.
+
+    Returns a list of Sections and _also_ modifies the parser object.
+    """
+
+    matches = parser.matches.values()
+    sections = []
+
+    for match in filter(lambda m: isinstance(m, Section), matches):
+        match.text = parser.text[match.startline:match.endline]
+        sections.append(match)
+
+    return sections
+
