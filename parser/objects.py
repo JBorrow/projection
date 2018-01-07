@@ -40,6 +40,7 @@ class Parser(object):
         # second replace loop - swap things out for comments, essentially
         self.replace_temp_with_final()
 
+        return
 
 
     def find_matches(self):
