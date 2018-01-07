@@ -89,3 +89,51 @@ def test_assign_section_text():
     assert output_parser == expected_output
 
 
+def test_assign_section_text_multiple():
+    """
+    Unit test for the function that assigns line numbers to the sections.
+    """
+
+    input_text = [
+        r"hello world",
+        r"%%\findme{Section}",
+        r"%%\findyou{Section 2}",
+        r"goodbye world",
+        r"%%\findme{Section 3}",
+        "",
+    ]
+
+    def secgen(input):
+        return Section(input, r"%%\\findme{(.*?)}", capture=1, id=0)
+
+    def secgenii(input):
+        return Section(input, r"%%\\findyou{(.*?)}", capture=1, id=1)
+
+    generators = {
+        re.compile(r"%%\\findme{(.*?)}"): secgen,
+        re.compile(r"%%\\findyou{(.*?)}"): secgenii,
+    }
+
+    parser = Parser(input_text, generators)
+
+    line_numbered_sections_0 = assign_section_line_numbers(parser, id=0)
+    line_numbered_sections_1 = assign_section_line_numbers(parser, id=1)
+
+    expected_output_0 = [
+        [r"# Section", r"# Section 2", r"goodbye world"],
+        [r"# Section 3", ""]
+    ]
+
+    expected_output_1 = [
+        [r"# Section 2", r"goodbye world", r"# Section 3", ""]
+    ]
+
+    assigned_sections_0 = assign_section_text(parser, id=0)
+    assigned_sections_1 = assign_section_text(parser, id=1)
+
+    output_0 = [m.text for m in assigned_sections_0]
+    output_1 = [m.text for m in assigned_sections_1]
+
+    assert output_0 == expected_output_0
+    assert output_1 == expected_output_1
+
