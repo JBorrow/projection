@@ -48,3 +48,20 @@ def assign_section_text(parser: Parser, id=None) -> List[Section]:
 
     return sections
 
+
+def assign_collector_line_numbers(parser: Parser, id=None) -> List[Collector]:
+    """
+    Assign a line number to each 'collector'.
+
+    Returns a list of collectors and _also_ modifies the parser object.
+    """
+
+    collectors = []
+    filter_expression = lambda m: isinstance(m[1], Collector) and m.id == id
+
+    for line, match in filter(filter_expression, parser.matches):
+        match.line = line
+        collectors.append(match)
+
+    return collectors
+
