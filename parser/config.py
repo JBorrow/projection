@@ -1,8 +1,11 @@
 from .generators import Collector, Section
 from .objects import Parser
 from .io import Database
+from .postprocess import \
+    assign_section_line_numbers, \
+    assign_section_text, \
+    assign_collector_line_numbers
 
-import .postprocess as pp
 
 import yaml
 import re
@@ -14,22 +17,44 @@ class Config(object):
             self.raw_data = yaml.load(file)
 
         with open(tex_filename, "r") as file:
-            self.text_data = text_file.readlines()
+            self.text_data = file.readlines()
 
         self.generators = {}
 
         self.get_sections()
         self.get_collectors()
 
-        self.parser = Parser(self.text_data, generators)
+        self.parser = Parser(self.text_data, self.generators)
         self.postprocessing_run()
-    
         
         self.db = Database(self.raw_data["meta"]["database"])
         self.write_to_db()
         del self.db
 
         return
+
+
+    def make_section(self, kwargs):
+        """
+        Make a section object!
+
+        We have to do this because otherwise we run into problems with
+        late binding.
+        """
+        def f(input):
+            return Section(input, **kwargs)
+
+        return f
+
+
+    def make_collector(self, kwargs):
+        """
+        Make a collector object!
+        """
+        def f(input):
+            return Collector(input, **kwargs)
+
+        return f
 
         
     def get_sections(self):
@@ -38,9 +63,9 @@ class Config(object):
         """
 
         for section in self.raw_data["sections"]:
-            regex = "%%\\{:s}{{(.*?)}}".format(section["syntax"])
+            regex = r"%%\\{:s}\{{(.*?)\}}".format(section["syntax"])
 
-            compiled = re.compile(regex)
+            compiled = re.compile(regex, re.VERBOSE)
 
             arguments = {
                 "regex": regex,
@@ -50,7 +75,7 @@ class Config(object):
                 "level": section["level"]
             }
 
-            self.generators[compiled] = lambda x: Section(x, **arguments)
+            self.generators[compiled] = self.make_section(arguments)
 
         return
 
@@ -61,9 +86,9 @@ class Config(object):
         """
 
         for collector in self.raw_data["collectors"]:
-            regex = "%%\\{:s}{{.*?}}".format(collector["syntax"])
+            regex = r"%%\\{:s}\{{.*?\}}".format(collector["syntax"])
         
-            compiled = re.compile(regex)
+            compiled = re.compile(regex, re.VERBOSE)
 
             arguments = {
                 "regex": regex,
@@ -71,7 +96,7 @@ class Config(object):
                 "capture": 0
             }
 
-            self.generators[compiled] = lambda x: Collector(x, **arguments)
+            self.generators[compiled] = self.make_collector(arguments)
 
         return
 
@@ -82,11 +107,11 @@ class Config(object):
         """
         
         for section in self.raw_data["sections"]:
-            pp.assign_section_line_numbers(self.parser, id=section["name"])
-            pp.assign_section_text(self.parser, id=section["name"])
+            assign_section_line_numbers(self.parser, id=section["name"])
+            assign_section_text(self.parser, id=section["name"])
 
-        for collector in self.raw_data["collector"]:
-            pp.assign_collector_line_numbers(self.parser, id=collector["name"])
+        for collector in self.raw_data["collectors"]:
+            assign_collector_line_numbers(self.parser, id=collector["name"])
 
         return
 
@@ -98,9 +123,9 @@ class Config(object):
 
         for match in self.parser.matches.values():
             if isinstance(match, Collector):
-                self.db.insert_collector(match.pack().values())
+                self.db.insert_collector(tuple(match.pack().values()))
             elif isinstance(match, Section):
-                self.db.insert_section(match.pack().values())
+                self.db.insert_section(tuple(match.pack().values()))
             else:
                 continue
 
