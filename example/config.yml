@@ -4,18 +4,21 @@
 meta:
   title: "Hello World"
   author: "Author"
+  database: "example.db"
 
 
-breaks:
+sections:
   - name: "Notes"
     syntax: "section"
+    level: 1
   - name: "Lectures"
     syntax: "lecture"
+    level: 2
 
 
 collectors:
   - name: "Keypoints"
-    sytnax: "keypoint"
+    syntax: "keypoint"
   - name: "Questions"
     syntax: "question"
 
