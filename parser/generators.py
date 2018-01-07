@@ -67,7 +67,8 @@ class Collector(Generator):
             uid,
             text,
             temporary_replacement,
-            output_text
+            output_text,
+            id
         ):
         """
         Unpacks a dictionary used to temporarily store the object contents.
@@ -80,6 +81,7 @@ class Collector(Generator):
         self.text = text
         self.temporary_replacement = temporary_replacement
         self.output_text = output_text
+        self.id = id
 
 
         return
@@ -100,6 +102,7 @@ class Collector(Generator):
         packed["text"] = self.text
         packed["temporary_replacement"] = self.temporary_replacement
         packed["output_text"] = self.output_text
+        packed["id"] = self.id
 
         return packed
 
@@ -131,6 +134,9 @@ class Section(Generator):
         self.level = level
         self.capture = capture
 
+        self.startline = None
+        self.endline = None
+
         # This calls Section.parse()
         super(Section, self).__init__(input)
 
@@ -159,24 +165,28 @@ class Section(Generator):
     def unpack(
             self,
             input,
-            line,
             regex,
             uid,
             text,
             temporary_replacement,
-            output_text
+            output_text,
+            startline,
+            endline,
+            id
         ):
         """
         Unpacks a dictionary used to temporarily store the object contents.
         """
 
         self.input = input
-        self.line = line
         self.regex = regex
         self.uid = uid
         self.text = text
         self.temporary_replacement = temporary_replacement
         self.output_text = output_text
+        self.startline = startline
+        self.endline = endline
+        self.id = id
 
 
         return
@@ -191,12 +201,14 @@ class Section(Generator):
         packed = {}
 
         packed["input"] = self.input
-        packed["line"] = self.line
         packed["regex"] = self.regex
         packed["uid"] = self.uid
         packed["text"] = self.text
         packed["temporary_replacement"] = self.temporary_replacement
         packed["output_text"] = self.output_text
+        packed["startline"] = self.startline
+        packed["endline"] = self.endline
+        packed["id"] = self.id
 
         return packed
 
