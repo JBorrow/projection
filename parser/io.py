@@ -8,18 +8,18 @@ class Database(object):
     def __init__(self, filename):
         self.conn = sqlite3.connect(filename)
 
-        if not self.check_tables_exist():
+        try:
             self.create_tables()
+        except sqlite3.OperationalError:
+            # Tables already created
+            pass
 
 
-    def check_tables_exist(self):
-        """
-        Checks if tables exist.
 
-        TODO: Implement this.
-        """
+    def __del__(self):
+        self.close_connection()
 
-        return False
+        return
 
 
     def create_tables(self):
@@ -31,15 +31,17 @@ class Database(object):
 
         c.execute("""
             create table collectors
-            (input text, line real, regex text, uid text, text text,
-             temporary_replacement text, output_text text, id real)"""
+            (input text, line int, capture int, 
+             regex text, uid text, text text,
+             temporary_replacement text, output_text text, id int)"""
         )
 
         c.execute("""
             create table sections
-            (input text, regex text, uid text, text text,
+            (input text, line int, level int, capture int, 
+             regex text, uid text, text text,
              temporary_replacement text, output_text text,
-             startline real, endline real, id real)"""
+             startline int, endline int, id int)"""
         )
                 
         self.conn.commit()
@@ -49,14 +51,14 @@ class Database(object):
         return
 
     
-    def insert_collectors(self, collectors):
+    def insert_collector(self, collector):
         """
         Insert an item into the collectors table.
         """
 
         c = self.conn.cursor()
 
-        c.execute("insert into collectors values (?,?,?,?,?,?,?,?)", collector)
+        c.execute("insert into collectors values (?,?,?,?,?,?,?,?,?)", collector)
 
         self.conn.commit()
 
@@ -65,14 +67,14 @@ class Database(object):
         return
 
 
-    def insert_sections(self, section):
+    def insert_section(self, section):
         """
         Insert an item into the sections table.
         """
 
         c = self.conn.cursor()
 
-        c.execute("insert into sections values (?,?,?,?,?,?,?,?,?)", section)
+        c.execute("insert into sections values (?,?,?,?,?,?,?,?,?,?,?,?)", section)
 
         self.conn.commit()
 
@@ -90,11 +92,10 @@ class Database(object):
 
         db_output = c.execute("select * from collectors")
 
-        c.close()
-
         keys = [
             "input",
             "line",
+            "capture",
             "regex",
             "uid",
             "text",
@@ -104,6 +105,8 @@ class Database(object):
         ]
 
         collectors = [Collector(dict(zip(keys, values))) for values in db_output]
+
+        c.close()
 
         return collectors
 
@@ -117,10 +120,11 @@ class Database(object):
 
         db_output = c.execute("select * from sections")
 
-        c.close()
-
         keys = [
             "input",
+            "line",
+            "level",
+            "capture",
             "regex",
             "uid",
             "text",
@@ -133,5 +137,16 @@ class Database(object):
 
         sections = [Section(dict(zip(keys, values))) for values in db_output]
 
+        c.close()
+
         return sections
+
+
+    def close_connection(self):
+        """
+        Closes the connection.
+        """
+        self.conn.close()
+
+        return
 

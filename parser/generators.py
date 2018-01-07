@@ -23,7 +23,7 @@ class Collector(Generator):
     string 'Keypoint' for a keypoint).
     """
     def __init__(self, input, regex=None, id=None, line=None, capture=0):
-        if regex is None:
+        if regex is None and not isinstance(input, dict):
             raise ValueError(
                 "Please supply a string or compiled pattern to the regex\
                  input value."
@@ -48,13 +48,13 @@ class Collector(Generator):
             uid, temporary_replacement, output_text.
         """
         
-        self.uid = uuid.uuid4()
+        self.uid = str(uuid.uuid4())
 
         self.text = re.search(self.regex, self.input)[self.capture]
 
-        self.temporary_replacement = str(self.uid)
+        self.temporary_replacement = self.uid
 
-        self.output_text = f"<!-- Collector {str(self.uid)} -->"
+        self.output_text = f"<!-- Collector {self.uid} -->"
 
         return
 
@@ -63,6 +63,7 @@ class Collector(Generator):
             self,
             input,
             line,
+            capture,
             regex,
             uid,
             text,
@@ -76,6 +77,7 @@ class Collector(Generator):
 
         self.input = input
         self.line = line
+        self.capture = capture
         self.regex = regex
         self.uid = uid
         self.text = text
@@ -97,6 +99,7 @@ class Collector(Generator):
 
         packed["input"] = self.input
         packed["line"] = self.line
+        packed["capture"] = self.capture
         packed["regex"] = self.regex
         packed["uid"] = self.uid
         packed["text"] = self.text
@@ -122,7 +125,7 @@ class Section(Generator):
     etc.
     """
     def __init__(self, input, regex=None, id=None, line=None, capture=0, level=1):
-        if regex is None:
+        if regex is None and not isinstance(input, dict):
             raise ValueError(
                 "Please supply a string or compiled pattern to the regex\
                  input value."
@@ -151,11 +154,11 @@ class Section(Generator):
             uid, temporary_replacement, output_text.
         """
         
-        self.uid = uuid.uuid4()
+        self.uid = str(uuid.uuid4())
 
         self.text = re.search(self.regex, self.input)[self.capture]
 
-        self.temporary_replacement = str(self.uid)
+        self.temporary_replacement = self.uid
 
         self.output_text = f"{'#'*self.level} {self.text}"
 
@@ -165,6 +168,9 @@ class Section(Generator):
     def unpack(
             self,
             input,
+            line,
+            level,
+            capture,
             regex,
             uid,
             text,
@@ -179,6 +185,9 @@ class Section(Generator):
         """
 
         self.input = input
+        self.line = line
+        self.level = level
+        self.capture = capture
         self.regex = regex
         self.uid = uid
         self.text = text
@@ -201,6 +210,9 @@ class Section(Generator):
         packed = {}
 
         packed["input"] = self.input
+        packed["line"] = self.line
+        packed["level"] = self.level
+        packed["capture"] = self.capture
         packed["regex"] = self.regex
         packed["uid"] = self.uid
         packed["text"] = self.text

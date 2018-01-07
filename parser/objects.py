@@ -194,7 +194,7 @@ class Generator(object):
             self.input = input
             self.parse()
 
-        elif isistance(input, dict):
+        elif isinstance(input, dict):
             # Unpack.
             self.unpack(**input)
 
@@ -208,6 +208,11 @@ class Generator(object):
                 f"The item passed to the generator must be of type dict or str,\
                   you passed an item of type {type(input)}."
             )
+
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+
 
     def parse(self):
         """
