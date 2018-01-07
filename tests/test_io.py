@@ -18,8 +18,8 @@ def test_insertion_extraction():
     db = Database("test.db")
 
     # Create mock objects.
-    col = Collector(input="test", regex=".*?", id=0, line=0)
-    sec = Section(input="test", regex=".*?", id=1)
+    col = Collector(input="test", regex=".*?", id="keypoint", line=0)
+    sec = Section(input="test", regex=".*?", id="section")
     sec.startline = 1
     sec.endline = 3
 

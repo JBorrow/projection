@@ -1,5 +1,7 @@
 import sqlite3
+
 from .generators import Collector, Section
+
 
 class Database(object):
     """
@@ -33,7 +35,7 @@ class Database(object):
             create table collectors
             (input text, line int, capture int, 
              regex text, uid text, text text,
-             temporary_replacement text, output_text text, id int)"""
+             temporary_replacement text, output_text text, id text)"""
         )
 
         c.execute("""
@@ -41,7 +43,7 @@ class Database(object):
             (input text, line int, level int, capture int, 
              regex text, uid text, text text,
              temporary_replacement text, output_text text,
-             startline int, endline int, id int)"""
+             startline int, endline int, id text)"""
         )
                 
         self.conn.commit()
