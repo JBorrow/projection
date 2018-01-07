@@ -1,5 +1,5 @@
 from .objects import Parser
-from .generators import Section
+from .generators import Section, Collector
 
 from typing import List
 
@@ -15,6 +15,7 @@ def assign_section_line_numbers(parser: Parser, id=None) -> List[Section]:
 
     for line_number, match in parser.matches.items():
         if isinstance(match, Section) and match.id == id:
+            match.line = line_number  # Cross-compat with collectors
             match.startline = line_number
 
             if prev_match is not None:
@@ -43,7 +44,7 @@ def assign_section_text(parser: Parser, id=None) -> List[Section]:
     filter_expression = lambda m: isinstance(m, Section) and m.id == id
 
     for match in filter(filter_expression, matches):
-        match.text = parser.text[match.startline:match.endline]
+        match.text = "\n".join(parser.text[match.startline:match.endline])
         sections.append(match)
 
     return sections
@@ -59,7 +60,7 @@ def assign_collector_line_numbers(parser: Parser, id=None) -> List[Collector]:
     collectors = []
     filter_expression = lambda m: isinstance(m[1], Collector) and m.id == id
 
-    for line, match in filter(filter_expression, parser.matches):
+    for line, match in filter(filter_expression, parser.matches.items()):
         match.line = line
         collectors.append(match)
 

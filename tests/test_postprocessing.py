@@ -75,9 +75,9 @@ def test_assign_section_text():
     line_numbered_sections = assign_section_line_numbers(parser)
 
     expected_output = [
-        [r"# Section"],
-        [r"# Section 2", r"goodbye world"],
-        [r"# Section 3", ""]
+        "# Section",
+        "# Section 2\ngoodbye world",
+        "# Section 3\n",
     ]
 
     assigned_sections = assign_section_text(parser)
@@ -120,12 +120,12 @@ def test_assign_section_text_multiple():
     line_numbered_sections_1 = assign_section_line_numbers(parser, id=1)
 
     expected_output_0 = [
-        [r"# Section", r"# Section 2", r"goodbye world"],
-        [r"# Section 3", ""]
+        "# Section\n# Section 2\ngoodbye world",
+        "# Section 3\n"
     ]
 
     expected_output_1 = [
-        [r"# Section 2", r"goodbye world", r"# Section 3", ""]
+        "# Section 2\ngoodbye world\n# Section 3\n"
     ]
 
     assigned_sections_0 = assign_section_text(parser, id=0)
