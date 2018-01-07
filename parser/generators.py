@@ -18,8 +18,11 @@ class Collector(Generator):
 
     and you want the text in the first capturing group -- this would correspond
     to capture=1 (rather than the default capture=0).
+
+    id is a unique identifier for this _type_ of collector (for example, the
+    string 'Keypoint' for a keypoint).
     """
-    def __init__(self, input, regex=None, line=None, capture=0):
+    def __init__(self, input, regex=None, id=None, line=None, capture=0):
         if regex is None:
             raise ValueError(
                 "Please supply a string or compiled pattern to the regex\
@@ -27,6 +30,7 @@ class Collector(Generator):
             )
 
         self.regex = regex
+        self.id = id
         self.line = line
         self.capture = capture
 
@@ -114,7 +118,7 @@ class Section(Generator):
 
     etc.
     """
-    def __init__(self, input, regex=None, line=None, capture=0, level=1):
+    def __init__(self, input, regex=None, id=None, line=None, capture=0, level=1):
         if regex is None:
             raise ValueError(
                 "Please supply a string or compiled pattern to the regex\
@@ -122,6 +126,7 @@ class Section(Generator):
             )
 
         self.regex = regex
+        self.id = id
         self.line = line
         self.level = level
         self.capture = capture

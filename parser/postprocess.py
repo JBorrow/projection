@@ -3,7 +3,7 @@ from .generators import Section
 
 from typing import List
 
-def assign_section_line_numbers(parser: Parser) -> List[Section]: 
+def assign_section_line_numbers(parser: Parser, id=None) -> List[Section]: 
     """
     Assign the sections their line numbers.
 
@@ -14,7 +14,7 @@ def assign_section_line_numbers(parser: Parser) -> List[Section]:
     sections = []
 
     for line_number, match in parser.matches.items():
-        if isinstance(match, Section):
+        if isinstance(match, Section) and match.id == id:
             match.startline = line_number
 
             if prev_match is not None:
@@ -31,7 +31,7 @@ def assign_section_line_numbers(parser: Parser) -> List[Section]:
     return sections
 
 
-def assign_section_text(parser: Parser) -> List[Section]:
+def assign_section_text(parser: Parser, id=None) -> List[Section]:
     """
     Assign the relevant text to each 'section'.
 
@@ -40,8 +40,9 @@ def assign_section_text(parser: Parser) -> List[Section]:
 
     matches = parser.matches.values()
     sections = []
+    filter_expression = lambda m: isinstance(m, Section) and m.id == id
 
-    for match in filter(lambda m: isinstance(m, Section), matches):
+    for match in filter(filter_expression, matches):
         match.text = parser.text[match.startline:match.endline]
         sections.append(match)
 
