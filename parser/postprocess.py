@@ -58,7 +58,7 @@ def assign_collector_line_numbers(parser: Parser, id=None) -> List[Collector]:
     """
 
     collectors = []
-    filter_expression = lambda m: isinstance(m[1], Collector) and m.id == id
+    filter_expression = lambda m: isinstance(m[1], Collector) and m[1].id == id
 
     for line, match in filter(filter_expression, parser.matches.items()):
         match.line = line
