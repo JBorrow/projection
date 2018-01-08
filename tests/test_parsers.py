@@ -5,7 +5,7 @@ This can be found in objects.py.
 """
 
 from parser.objects import Parser
-from parser.generators import Collector, Section
+from parser.generators import Collector, Section, Removal
 
 import re
 
@@ -150,4 +150,43 @@ def test_section_and_collector():
     ]
 
     assert expected_output == parser.text
+
+
+def test_removal():
+    """
+    Unit test for the removal class.
+    """
+
+    input_text = [
+        r"hello world",
+        r"%%\beginpdfonly",
+        r"THIS IS ONLY FOR THE PDF!",
+        r"%%\endpdfonly",
+        r"goodbye world",
+        "",
+    ]
+
+    def remgens(input):
+        return Removal(input, r"%%\\beginpdfonly", se="s", id="pdfonly")
+
+    def remgene(input):
+        return Removal(input, r"%%\\endpdfonly", se="e", id="pdfonly")
+
+    generators = {
+        re.compile(r"%%\\beginpdfonly"): remgens,
+        re.compile(r"%%\\endpdfonly"): remgene
+    }
+
+    parser = Parser(input_text, generators)
+
+    expected_output = [
+        r"hello world",
+        r"<!--",
+        r"THIS IS ONLY FOR THE PDF!",
+        r"-->",
+        r"goodbye world",
+        "",
+    ]
+
+    assert parser.text == expected_output
 

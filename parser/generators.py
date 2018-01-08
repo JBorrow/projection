@@ -224,3 +224,107 @@ class Section(Generator):
 
         return packed
 
+
+class Removal(Generator):
+    """
+    Removal object.
+    There should be two of these per 'removal' -- i.e. one to start and one
+    to end the region that is being removed.
+
+    In postprocessing, we'll remove the 'end' ones once we have assigned
+    the text to be removed. Start/end is denoted by se=s or e.
+    """
+    def __init__(self, input, regex=None, id=None, line=None, se=None):
+        if regex is None and not isinstance(input, dict):
+            raise ValueError(
+                "Please supply a string or compiled pattern to the regex\
+                 input value."
+            )
+
+        self.regex = regex
+        self.id = id
+        self.line = line
+        self.text = ""
+        self.se = se
+
+        self.startline = None
+        self.endline = None
+
+        # This calls Removal.parse() -- which we don't actually care about
+        super(Removal, self).__init__(input)
+
+        return
+
+
+    def parse(self):
+        """
+        Parse the line -- all we need to do here is stick a HTML comment.
+        This sets:
+            uid, temporary_replacement, output_text.
+        """
+        
+        self.uid = str(uuid.uuid4())
+
+        self.temporary_replacement = self.uid
+
+        if self.se == "s":
+            self.output_text = "<!--"
+        elif self.se == "e":
+            self.output_text = "-->"
+        else:
+            raise AttributeError("se attribute of Removal not set to s or e")
+
+        return
+    
+
+    def pack(self):
+        """
+        Pack to a dictionary for storing in the database.
+        """
+
+        packed = {}
+
+        packed["regex"] = self.regex
+        packed["uid"] = self.uid
+        packed["id"] = self.id
+        packed["line"] = self.line
+        packed["text"] = self.text
+        packed["temporary_replacement"] = self.temporary_replacement
+        packed["output_text"] = self.output_text
+        packed["startline"] = self.startline
+        packed["endline"] = self.endline
+        packed["se"] = self.se
+
+        return packed
+
+
+    def unpack(
+            self,
+            regex,
+            uid,
+            id,
+            line,
+            text,
+            temporary_replacement,
+            output_text,
+            startline,
+            endline,
+            se
+        ):
+        """
+        Unpack a dictionary to object properties.
+        """
+
+        self.regex = regex
+        self.uid = uid
+        self.id = id
+        self.line = line
+        self.text = text
+        self.temporary_replacement = temporary_replacement
+        self.output_text = output_text
+        self.startline = regex
+        self.endline = endline
+        self.se = se
+
+        return
+

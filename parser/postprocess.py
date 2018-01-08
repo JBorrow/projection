@@ -1,5 +1,5 @@
 from .objects import Parser
-from .generators import Section, Collector
+from .generators import Section, Collector, Removal
 
 from typing import List
 
@@ -65,4 +65,66 @@ def assign_collector_line_numbers(parser: Parser, id=None) -> List[Collector]:
         collectors.append(match)
 
     return collectors
+
+
+def assign_removal_line_numbers(parser: Parser, id=None) -> List[Removal]:
+    """
+    Assign the start/end line numbers to the removal items, and delete/pop
+    the removal-end objects.
+    """
+
+    start = None
+    end = None
+
+    removals = []
+    ends = []
+
+    filter_expression = lambda m: isinstance(m[1], Removal) and m[1].id == id
+
+    for line, match in filter(filter_expression, parser.matches.items()):
+        match.line = line
+        print(f"line {line} made it!")
+
+        if match.se == "s":
+            # Start!
+            start = match
+
+        elif match.se == "e":
+            # End!
+            end = match
+
+            start.startline = start.line
+            start.endline = end.line
+
+            end = None
+            start = None
+
+            removals.append(start)
+            ends.append(line)
+
+        else:
+            raise AttributeError("Start/end of Removal object not set.")
+
+
+    for line in ends:
+        del parser.matches[line]
+
+
+    return removals
+
+
+def assign_removal_text(parser: Parser, id=None) -> List[Removal]:
+    """
+    Assign the relevant text to the Removal object.
+    """
+
+    removals = []
+    filter_expression = lambda m: isinstance(m[1], Removal) and m[1].id == id
+
+    for line, match in filter(filter_expression, parser.matches.items()):
+        match.text = "\n".join(parser.text[match.startline:match.endline+1])
+        removals.append(match)
+
+    return removals
+
 

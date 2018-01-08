@@ -4,10 +4,13 @@ Unit tests for postprocess.py
 
 from parser.postprocess import \
         assign_section_line_numbers,\
-        assign_section_text
+        assign_section_text,\
+        assign_removal_line_numbers,\
+        assign_removal_text
+
 
 from parser.objects import Parser
-from parser.generators import Section
+from parser.generators import Section, Removal
 
 import re
 
@@ -136,4 +139,39 @@ def test_assign_section_text_multiple():
 
     assert output_0 == expected_output_0
     assert output_1 == expected_output_1
+
+
+def test_removal():
+    """
+    Unit test for the removal postprocessing functions.
+    """
+
+    input_text = [
+        r"hello world",
+        r"%%\beginpdfonly",
+        r"THIS IS ONLY FOR THE PDF!",
+        r"%%\endpdfonly",
+        r"goodbye world",
+        "",
+    ]
+
+    def remgens(input):
+        return Removal(input, r"%%\\beginpdfonly", se="s", id="pdfonly")
+
+    def remgene(input):
+        return Removal(input, r"%%\\endpdfonly", se="e", id="pdfonly")
+
+    generators = {
+        re.compile(r"%%\\beginpdfonly"): remgens,
+        re.compile(r"%%\\endpdfonly"): remgene
+    }
+
+    parser = Parser(input_text, generators)
+
+    assign_removal_line_numbers(parser, "pdfonly")
+    assign_removal_text(parser, "pdfonly")
+
+    expected_text = "<!--\nTHIS IS ONLY FOR THE PDF!\n-->"
+
+    assert parser.matches[1].text == expected_text
 
