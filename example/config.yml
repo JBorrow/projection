@@ -25,7 +25,9 @@ collectors:
 
 removals:
   - name: "PDFONLY"
-    syntax: "@pdfonly"
+    syntax:
+      start: "beginpdfonly"
+      end: "endpdfonly"
 
 
 # Here we define our pages that are not the ones defined by 'breaks'
