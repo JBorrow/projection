@@ -1,3 +1,8 @@
+"""
+Contains a number of postprocessing functions that essentially assign
+the line numbers and relevant text to the 'Generator' objects.
+"""
+
 from .objects import Parser
 from .generators import Section, Collector, Removal
 

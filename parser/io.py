@@ -1,6 +1,13 @@
+"""
+Holds the database object.
+
+This object handles the creation of database and tables,
+and pushing/pulling our objects to them.
+"""
+
 import sqlite3
 
-from .generators import Collector, Section
+from .generators import Collector, Section, Removal
 
 
 class Database(object):

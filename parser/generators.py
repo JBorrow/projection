@@ -1,3 +1,13 @@
+"""
+Holds the three main generators objects,
+
+    + Collector
+    + Section
+    + Removal
+
+that all inherit from .objects.Generator.
+"""
+
 import uuid
 import re
 

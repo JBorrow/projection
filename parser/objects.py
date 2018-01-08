@@ -1,3 +1,11 @@
+"""
+Main objects file. This contains two objects:
+
+    + Parser (the main Parser object),
+    + Generator (which all generators inherit from.
+"""
+
+
 import re
 import ltmd
 

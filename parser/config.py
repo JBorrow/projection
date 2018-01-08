@@ -1,3 +1,12 @@
+"""
+Contains the configuration object. This object:
+
+    + Loads the configuration file
+    + Runs the parser
+    + Hands outputs to the database.
+"""
+
+
 from .generators import Collector, Section, Removal
 from .objects import Parser
 from .io import Database
@@ -14,6 +23,15 @@ import re
 
 
 class Config(object):
+    """
+    Main configuration object.
+
+    To access the final output text, you will need to use
+
+        Config.parser.text,
+
+    as Config.text_data is the line-by-like data.
+    """
     def __init__(self, tex_filename, config_filename):
         with open(config_filename, "r") as file:
             self.raw_data = yaml.load(file)
