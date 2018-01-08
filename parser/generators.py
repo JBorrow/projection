@@ -284,6 +284,7 @@ class Removal(Generator):
 
         packed = {}
 
+        packed["input"] = self.input
         packed["regex"] = self.regex
         packed["uid"] = self.uid
         packed["id"] = self.id
@@ -300,6 +301,7 @@ class Removal(Generator):
 
     def unpack(
             self,
+            input,
             regex,
             uid,
             id,
@@ -315,6 +317,7 @@ class Removal(Generator):
         Unpack a dictionary to object properties.
         """
 
+        self.input = input
         self.regex = regex
         self.uid = uid
         self.id = id

@@ -1,10 +1,12 @@
-from .generators import Collector, Section
+from .generators import Collector, Section, Removal
 from .objects import Parser
 from .io import Database
 from .postprocess import \
     assign_section_line_numbers, \
     assign_section_text, \
-    assign_collector_line_numbers
+    assign_collector_line_numbers, \
+    assign_removal_line_numbers, \
+    assign_removal_text
 
 
 import yaml
@@ -23,6 +25,7 @@ class Config(object):
 
         self.get_sections()
         self.get_collectors()
+        self.get_removals()
 
         self.parser = Parser(self.text_data, self.generators)
         self.postprocessing_run()
@@ -53,6 +56,16 @@ class Config(object):
         """
         def f(input):
             return Collector(input, **kwargs)
+
+        return f
+
+
+    def make_removal(self, kwargs):
+        """
+        Make a removal object!
+        """
+        def f(input):
+            return Removal(input, **kwargs)
 
         return f
 
@@ -101,6 +114,28 @@ class Config(object):
         return
 
 
+    def get_removals(self):
+        """
+        Get the removal generators.
+        """
+
+        for removal in self.raw_data["removals"]:
+            for se in ["start", "end"]:
+                regex = r"%%\\{:s}".format(removal["syntax"][se])
+
+                compiled = re.compile(regex, re.VERBOSE)
+
+                arguments = {
+                    "regex": regex,
+                    "id": removal["name"],
+                    "se": se[0]
+                }
+
+                self.generators[compiled] = self.make_removal(arguments)
+
+        return
+
+
     def postprocessing_run(self):
         """
         Run all of the postprocessing functions.
@@ -112,6 +147,10 @@ class Config(object):
 
         for collector in self.raw_data["collectors"]:
             assign_collector_line_numbers(self.parser, id=collector["name"])
+
+        for removal in self.raw_data["removals"]:
+            assign_removal_line_numbers(self.parser, id=removal["name"])
+            assign_removal_text(self.parser, id=removal["name"])
 
         return
 
@@ -126,6 +165,8 @@ class Config(object):
                 self.db.insert_collector(tuple(match.pack().values()))
             elif isinstance(match, Section):
                 self.db.insert_section(tuple(match.pack().values()))
+            elif isinstance(match, Removal):
+                self.db.insert_removal(tuple(match.pack().values()))
             else:
                 continue
 

@@ -83,7 +83,6 @@ def assign_removal_line_numbers(parser: Parser, id=None) -> List[Removal]:
 
     for line, match in filter(filter_expression, parser.matches.items()):
         match.line = line
-        print(f"line {line} made it!")
 
         if match.se == "s":
             # Start!

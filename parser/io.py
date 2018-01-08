@@ -45,6 +45,13 @@ class Database(object):
              temporary_replacement text, output_text text,
              startline int, endline int, id text)"""
         )
+
+        c.execute("""
+            create table removals
+            (input text, regex text, uid text, id text, line int,
+             text text, temporary_replacement text, output_text text,
+             startline int, endline int, se text)"""
+        )
                 
         self.conn.commit()
 
@@ -83,6 +90,20 @@ class Database(object):
         c.close()
 
         return
+
+
+    def insert_removal(self, removal):
+        """
+        Insert a removal into the removals table.
+        """
+        
+        c = self.conn.cursor()
+
+        c.execute("insert into removals values(?,?,?,?,?,?,?,?,?,?,?)", removal)
+
+        self.conn.commit()
+
+        c.close()
 
     
     def grab_collectors(self):
@@ -142,6 +163,36 @@ class Database(object):
         c.close()
 
         return sections
+
+
+    def grab_removals(self):
+        """
+        Grab a list of all removals as removal objects.
+        """
+
+        c = self.conn.cursor()
+
+        db_output = c.execute("select * from removals")
+
+        keys = [
+            "input",
+            "regex",
+            "uid",
+            "id",
+            "line",
+            "text",
+            "temporary_replacement",
+            "output_text",
+            "startline",
+            "endline",
+            "se",
+        ]
+
+        removals = [Removal(dict(zip(keys, values))) for values in db_output]
+
+        c.close()
+
+        return removals
 
 
     def close_connection(self):
