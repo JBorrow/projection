@@ -10,7 +10,7 @@ meta:
 sections:
   - name: "Notes"
     syntax: "section"
-    level: 1
+    level: 0
   - name: "Lectures"
     syntax: "lecture"
     level: 2

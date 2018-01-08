@@ -160,7 +160,10 @@ class Section(Generator):
 
         self.temporary_replacement = self.uid
 
-        self.output_text = f"{'#'*self.level} {self.text}"
+        if self.level:
+            self.output_text = f"{'#'*self.level} {self.text}"
+        else: # Don't show!
+            self.output_text = ""
 
         return
 
