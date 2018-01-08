@@ -10,6 +10,19 @@ be passed to the frontend code that turns it into a website.
 You can define your own templates in `frontend/template`.
 
 
+Requirements
+------------
+
+Due to some constraints on how dictionaries are used, `projection` requires
+python3.6.0 (CPython) or above.
+
+The python requirements are available in `requirements.txt` and may be
+installed through `pip install -r requirements.txt`.
+
+You will also need `pandoc` and the pandoc requirements from `ltmd`, which
+unfortunately on most machines will require installation from source.
+
+
 What?
 -----
 
