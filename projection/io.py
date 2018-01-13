@@ -205,6 +205,81 @@ class Database(object):
         return removals
 
 
+    def select_collectors(self, line_between, id):
+        """
+        Grab a list of collectors as collector objects.
+
+        line_between is a 2-length list of integers. Lines are selected
+        between these two ([0] is lower bound, [1] is upper bound).
+
+        id is the 'id' of the collector that you wish to select.
+        """
+
+        c = self.conn.cursor()
+
+        db_output = c.execute("""
+            select * from collectors where (line between ? and ?) and
+            id = "?"
+            """, *line_between, id)
+
+        keys = [
+            "input",
+            "line",
+            "capture",
+            "regex",
+            "uid",
+            "text",
+            "temporary_replacement",
+            "output_text",
+            "id",
+        ]
+
+        collectors = [Collector(dict(zip(keys, values))) for values in db_output]
+
+        c.close()
+
+        return collectors
+
+
+    def select_collectors(self, line_between, id):
+        """
+        Grab a list of sections as section objects.
+
+        line_between is a 2-length list of integers. Lines are selected
+        between these two ([0] is lower bound, [1] is upper bound).
+
+        id is the 'id' of the collector that you wish to select.
+        """
+
+        c = self.conn.cursor()
+
+        db_output = c.execute("""
+            select * from sections where (line between ? and ?) and
+            id = "?"
+            """, *line_between, id)
+
+        keys = [
+            "input",
+            "line",
+            "level",
+            "capture",
+            "regex",
+            "uid",
+            "text",
+            "temporary_replacement",
+            "output_text",
+            "startline",
+            "endline",
+            "id",
+        ]
+
+        sections = [Section(dict(zip(keys, values))) for values in db_output]
+
+        c.close()
+
+        return sections
+
+
     def close_connection(self):
         """
         Closes the connection.
