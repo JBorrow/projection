@@ -1,4 +1,4 @@
-from parser.config import Config
+from projection.parser.config import Config
 
 import os
 

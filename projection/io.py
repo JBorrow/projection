@@ -7,7 +7,10 @@ and pushing/pulling our objects to them.
 
 import sqlite3
 
-from .generators import Collector, Section, Removal
+from .parser.generators import \
+    Collector,\
+    Section,\
+    Removal
 
 
 class Database(object):

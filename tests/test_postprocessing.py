@@ -2,15 +2,15 @@
 Unit tests for postprocess.py
 """
 
-from parser.postprocess import \
+from projection.parser.postprocess import \
         assign_section_line_numbers,\
         assign_section_text,\
         assign_removal_line_numbers,\
         assign_removal_text
 
 
-from parser.objects import Parser
-from parser.generators import Section, Removal
+from projection.parser.objects import Parser
+from projection.parser.generators import Section, Removal
 
 import re
 

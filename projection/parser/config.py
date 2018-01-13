@@ -7,9 +7,9 @@ Contains the configuration object. This object:
 """
 
 
+from ..io import Database
 from .generators import Collector, Section, Removal
 from .objects import Parser
-from .io import Database
 from .postprocess import \
     assign_section_line_numbers, \
     assign_section_text, \

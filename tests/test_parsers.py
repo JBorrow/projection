@@ -4,8 +4,8 @@ Tests for the parser.
 This can be found in objects.py.
 """
 
-from parser.objects import Parser
-from parser.generators import Collector, Section, Removal
+from projection.parser.objects import Parser
+from projection.parser.generators import Collector, Section, Removal
 
 import re
 

@@ -2,8 +2,8 @@
 Tests for the IO -- including database tests.
 """
 
-from parser.io import Database
-from parser.generators import Collector, Section
+from projection.io import Database
+from projection.parser.generators import Collector, Section
 
 import os
 import uuid
