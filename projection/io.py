@@ -241,7 +241,7 @@ class Database(object):
         return collectors
 
 
-    def select_collectors(self, line_between, id):
+    def select_sections(self, line_between, id):
         """
         Grab a list of sections as section objects.
 
